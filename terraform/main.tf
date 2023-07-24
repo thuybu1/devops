@@ -29,48 +29,12 @@ module "origin_ws_instance" {
   project_prefix     = var.project_prefix
   key_name           = module.ws_key.key_name
   instance_name      = var.origin_name
-  security_group_ids = [module.security_groups.alb_sg_id]
+  security_group_ids = [module.security_groups.web_instance_sg_id]
   subnet_id          = module.vpc.public_subnet[0].id
   common_tags        = var.common_tags
   ami_type           = var.ami_type
   instance_type      = var.instance_type
   user_data          = var.user_data
-}
-
-# APPLICATION LOAD BALANCERS
-module "alb" {
-  source              = "./modules/lb"
-  common_tags         = var.common_tags
-  alb_security_groups = [module.security_groups.alb_sg_id]
-  vpc_id              = module.vpc.vpc_id
-  public_subnet_ids   = module.vpc.public_subnet.*.id
-  project_prefix      = var.project_prefix
-  target_instance_id  = module.origin_ws_instance.instance_id
-}
-
-# AUTOSCALING WITH LAUNCH TEMPLATE CREATED FROM ORIGINAL WEB SERVER AMI
-# Launch Template
-module "web_server_lt" {
-  source           = "./modules/lt"
-  common_tags      = var.common_tags
-  autoscaling_sg   = module.security_groups.web_tier_sg_id
-  instance_name    = "Web Server"
-  instance_keypair = module.ws_key.key_name
-  instance_type    = var.instance_type
-  instance_id      = module.origin_ws_instance.instance_id
-  image_id         = var.ami_type
-  project_prefix   = var.project_prefix
-  user_data        = filebase64("${path.module}/userdata.sh")
-}
-
-# Auto scaling group with CloudWatch Alarms
-module "auto_scaling" {
-  source            = "./modules/as"
-  project_prefix    = var.project_prefix
-  common_tags       = var.common_tags
-  subnet_ids        = module.vpc.private_subnet.*.id
-  target_group_arns = module.alb.target_group_arns
-  launch_template   = module.web_server_lt.lt
 }
 
 
