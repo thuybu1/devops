@@ -10,9 +10,9 @@ provider_region = "us-east-1"
 
 # VPC
 vpc_cidr        = "10.0.0.0/16"
-azs             = ["us-east-1a", "us-east-1b", "us-east-1c"]
-public_subnets  = ["10.0.1.0/24", "10.0.3.0/24", "10.0.5.0/24"]
-private_subnets = ["10.0.2.0/24", "10.0.4.0/24", "10.0.6.0/24"]
+azs             = ["us-east-1a", "us-east-1b"]
+public_subnets  = ["10.0.1.0/24", "10.0.3.0/24"]
+private_subnets = ["10.0.2.0/24", "10.0.4.0/24"]
 common_tags = {
   "Terraform" = "TRUE"
   "Project"   = "SDE DevOps"
@@ -28,8 +28,12 @@ user_data     = <<-EOF
               sudo yum update -y
               sudo yum install git -y
               sudo amazon-linux-extras install docker
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
               sudo usermod -aG docker ec2-user
+              sudo git clone https://github.com/thuybu1/spamdetectionweb.git
+              sudo docker-compose build
+              sudo docker-compose up -d
               EOF
 
-# 
 
