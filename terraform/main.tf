@@ -23,18 +23,6 @@ module "ws_key" {
   common_tags    = var.common_tags
 }
 
-# DATABASE INSTANCE
-module "rds_mysql_db" {
-  source             = "./modules/rds"
-  common_tags        = var.common_tags
-  subnet_ids         = module.vpc.private_subnet.*.id
-  db_name            = "lab1db"
-  username           = "admin"
-  password           = "abc123456"
-  identifier         = "lab1-db"
-  security_group_ids = [module.security_groups.db_tier_sg_id]
-}
-
 # MAIN WEB SERVER FOR DEPLOYING CODES
 module "origin_ws_instance" {
   source             = "./modules/ec2"
@@ -48,27 +36,6 @@ module "origin_ws_instance" {
   instance_type      = var.instance_type
   user_data          = var.user_data
 }
-
-# # BASTION HOST
-# module "nat_instance" {
-#   source             = "./modules/ec2"
-#   project_prefix     = var.project_prefix
-#   key_name           = module.ws_key.key_name
-#   instance_name      = "${var.project_prefix} Bastion Host"
-#   security_group_ids = [module.security_groups.public_bastion_sg_id]
-#   subnet_id          = module.vpc.public_subnet[0].id
-#   common_tags        = var.common_tags
-#   ami_type           = "ami-0356fe6f21ab7c13e"
-#   instance_type      = var.instance_type
-# }
-# resource "aws_eip" "nat_eip" {
-#   vpc = true
-# }
-# resource "aws_eip_association" "nat_eip_assoc" {
-#   instance_id   = module.nat_instance.instance_id
-#   allocation_id = aws_eip.nat_eip.id
-# }
-
 
 # APPLICATION LOAD BALANCERS
 module "alb" {
