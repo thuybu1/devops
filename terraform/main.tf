@@ -23,8 +23,8 @@ module "ws_key" {
   common_tags    = var.common_tags
 }
 
-# MAIN WEB SERVER FOR DEPLOYING CODES
-module "origin_ws_instance" {
+# PRODUCTION SERVER FOR DEPLOYING CODES
+module "prod_server" {
   source             = "./modules/ec2"
   project_prefix     = var.project_prefix
   key_name           = module.ws_key.key_name
@@ -36,6 +36,7 @@ module "origin_ws_instance" {
   instance_type      = var.instance_type
   user_data          = var.user_data
 }
+
 
 
 
